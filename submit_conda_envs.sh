@@ -15,7 +15,7 @@ smk="single_steps/sort_pull.smk"
 
 snakemake \
 -p \
--s $1 \
+-s $smk \
 --conda-prefix "/SAN/vyplab/vyplab_reference_genomes/conda_envs/" \
 --use-conda \
 --conda-create-envs-only \
