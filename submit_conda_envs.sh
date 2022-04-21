@@ -10,6 +10,9 @@
 #$ -R y
 #$ -N single_steps_conda_envs
 
+# This one uses the default/universal single steps conda env
+smk="single_steps/sort_pull.smk"
+
 snakemake \
 -p \
 -s $1 \

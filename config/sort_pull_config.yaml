@@ -1,12 +1,12 @@
 # Directory containing input BAMs from which to extract FASTQs
-input_dir: bam_dir/
+input_dir: tests/test_data/
 bam_suffix: ".bam"
 
 # Directory to store temporary name-sorted BAM files
-temp_dir: temp_name_sort_dir/
+temp_dir: tests/temp_name_sort_dir/
 
 # Where to output pulled FASTQs
-fastq_spot: pulled_fastq/
+fastq_spot: tests/pulled_fastq/
 
 # 'pe' for paired-end, 'se' for single-end
 end_type: "pe"
