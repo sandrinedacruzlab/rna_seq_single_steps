@@ -1,11 +1,24 @@
+configfile: "config/salmon_config.yaml"
+
+#########---------------
+## Input parameters
+#########---------------
+config_path = "config/salmon_config.yaml" # this is for copying later
+
+transcripts = config["transcripts"]
+threads = config["threads"]
+output_index_dir = config["salmon_index_dir"]
+
 rule salmon_index:
     input:
-        "/SAN/vyplab/vyplab_reference_genomes/sequence/human/gencode/gencode.v34.transcripts.fa"
+        transcripts = transcripts
     output:
-        directory("/SAN/vyplab/vyplab_reference_genomes/salmon/transcriptome_index")
-    threads: 2
+        directory(output_index_dir)
+    params:
+        threads = threads
     shell:
         """
-        /SAN/vyplab/alb_projects/tools/salmon-latest_linux_x86_64/bin/salmon index -t {input} -i {output} --threads {threads} --gencode
+        /SAN/vyplab/alb_projects/tools/salmon-latest_linux_x86_64/bin/salmon index \
+        -t {input.transcripts} -i {output} --threads {threads} --gencode
         """
 

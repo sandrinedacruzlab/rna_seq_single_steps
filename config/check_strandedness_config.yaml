@@ -1,0 +1,7 @@
+#works only with paired-end data
+sampleCSVpath: /SAN/vyplab/alb_projects/data/liu_facs_neurons/Liu_facs_samples.csv
+
+gtf: /SAN/vyplab/vyplab_reference_genomes/annotation/human/ensembl/Homo_sapiens.GRCh38.100.gtf.gz
+transcripts: /SAN/vyplab/vyplab_reference_genomes/sequence/human/ensembl/Homo_sapiens.GRCh38.cdna.all.fa.gz
+
+output_dir: /SAN/vyplab/alb_projects/data/liu_facs_neurons/strandedness

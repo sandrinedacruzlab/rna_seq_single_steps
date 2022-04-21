@@ -1,4 +1,4 @@
-configfile: "config/single_steps_config.yaml"
+configfile: "config/bedtools_coverage_config.yaml"
 import os
 
 
@@ -13,20 +13,19 @@ As I've currently set up:
 #########---------------
 ## Input parameters
 #########---------------
-options_dict = config["bedtools_coverage"]
-config_path = "config/single_steps_config.yaml" # this is for copying later
+config_path = "config/bedtools_coverage_config.yaml" # this is for copying later
 
-bam_dir = options_dict["bam_dir"]
+bam_dir = config["bam_dir"]
 
 # Pick out bams from bam_dir with this bam_suffix
 # Also used to strip from file to get sample name
 # e.g. Cont-B_S2.pass2Aligned.sortedByCoord.out.bam becomes Cont-B_S2
-bam_suffix = options_dict["bam_suffix"]
+bam_suffix = config["bam_suffix"]
 
-bed_path = options_dict["bed_path"]
+bed_path = config["bed_path"]
 
 #Make sure trailing slash
-output_dir = options_dict["output_dir"]
+output_dir = config["output_dir"]
 
 #########---------------
 ## BEDTOOLS PARAMETERS
@@ -36,25 +35,25 @@ output_dir = options_dict["output_dir"]
 
 # -s - only report hits overlapping on the same strand
 # -S - only report hits overlapping on opposite strands
-strandedness = options_dict["strandedness"]
+strandedness = config["strandedness"]
 
 # Report the depth at each position in each interval
-depth = options_dict["depth"]
+depth = config["depth"]
 # what operations to summarise coverage in each intervals from bed_path? All below are valid strings
 # sum, count, count_distinct, min, max, last
 # median, mode, antimode, stdev, sstdev, collapse
 # distinct, concat, freqasc, freqdesc, first, last
 # If just want per-base coverages, assign to an empty list with []
-operations = options_dict["operations"]
+operations = config["operations"]
 
 #1-based - which column should operation be performed on? (with depth = -d & a 6 col BED, this is the 8th column)
-operation_column = options_dict["operation_column"]
+operation_column = config["operation_column"]
 
 # No need to change these unless necessary
 
-sorted = options_dict["sorted"]
-bedtools_path = options_dict["bedtools_path"]
-samtools_path = options_dict["samtools_path"]
+sorted = config["sorted"]
+bedtools_path = config["bedtools_path"]
+samtools_path = config["samtools_path"]
 ########-----------------
 
 SAMPLES = [f.replace(bam_suffix, "") for f in os.listdir(bam_dir) if f.endswith(bam_suffix)]
@@ -70,9 +69,9 @@ localrules: all, copy_config
 
 rule all:
     input:
-        expand(output_dir + "{sample}.coverage.per_base.tsv", sample = SAMPLES),
-        expand(output_dir + "{sample}.coverage.{operation}.tsv" if len(operations) > 0 else [], sample = SAMPLES, operation = operations),
-        os.path.join(output_dir, config_path)
+        expand(os.path.join(output_dir, "{sample}.coverage.per_base.tsv"), sample = SAMPLES),
+        expand(os.path.join(output_dir, "{sample}.coverage.{operation}.tsv") if len(operations) > 0 else [], sample = SAMPLES, operation = operations),
+        os.path.join(output_dir, "config_bedtools.yaml")
 
 # Get order of chromosome reference names from header of BAM file
 # Enables sorting BED for each sample, so can use -sorted option
@@ -85,7 +84,7 @@ rule bam_chrom_order:
         os.path.join(bam_dir, "{sample}" + bam_suffix)
 
     output:
-        temp(output_dir + "{sample}.genome.txt")
+        temp(os.path.join(output_dir, "{sample}.genome.txt"))
 
     params:
         samtools_path
@@ -101,10 +100,10 @@ rule bedtools_coverage:
     input:
         bam = os.path.join(bam_dir, "{sample}" + bam_suffix),
         bed = bed_path,
-        chr_order = output_dir + "{sample}.genome.txt"
+        chr_order = os.path.join(output_dir, "{sample}.genome.txt")
 
     output:
-        output_dir + "{sample}.coverage.per_base.tsv"
+        os.path.join(output_dir, "{sample}.coverage.per_base.tsv")
 
     params:
         path = bedtools_path,
@@ -129,10 +128,10 @@ rule bedtools_coverage:
 
 rule bedtools_groupby:
     input:
-        output_dir + "{sample}.coverage.per_base.tsv",
+        os.path.join(output_dir,  "{sample}.coverage.per_base.tsv"),
 
     output:
-        output_dir + "{sample}.coverage.{operation}.tsv"
+        os.path.join(output_dir,  "{sample}.coverage.{operation}.tsv")
 
     params:
         path = bedtools_path,
@@ -152,11 +151,11 @@ rule bedtools_groupby:
 rule copy_config:
     input:
         conf = config_path,
-        per_base = expand(output_dir + "{sample}.coverage.per_base.tsv", sample = SAMPLES),
-        summary = expand(output_dir + "{sample}.coverage.{operation}.tsv" if len(operations) > 0 else [], sample = SAMPLES, operation = operations)
+        per_base = expand(os.path.join(output_dir, "{sample}.coverage.per_base.tsv"), sample = SAMPLES),
+        summary = expand(os.path.join(output_dir, "{sample}.coverage.{operation}.tsv") if len(operations) > 0 else [], sample = SAMPLES, operation = operations)
 
     output:
-        os.path.join(output_dir, config_path)
+        os.path.join(output_dir, "config_bedtools.yaml")
 
     shell:
         """

@@ -1,0 +1,14 @@
+transcripts: "/SAN/vyplab/vyplab_reference_genomes/sequence/human/gencode/gencode.v34.transcripts.fa"
+
+salmon_index_dir: "/SAN/vyplab/vyplab_reference_genomes/salmon/transcriptome_index"
+
+# a top level folder where the bams reside
+project_dir: "/SAN/vyplab/alb_projects/data/4su_full_ward_tdp_kd_ipsc/"
+out_spot: "salmon"
+fastq_spot: "merged_fastqs"
+
+salmon_strand_info: "-l ISF"
+end_type: "pe"
+threads: 4
+
+gtf: "/SAN/vyplab/vyplab_reference_genomes/annotation/human/GRCh38/gencode.v34.annotation.gtf"

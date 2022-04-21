@@ -1,41 +1,63 @@
+configfile: "config/sort_pull_config.yaml"
 import os
-# a top level folder where the bams reside
-project_dir = "/home/annbrown/data/ursa_mouse"
-out_spot = "name_sortbams/"
-bam_spot = "ori_bams/"
-fastq_dir = "pulled_fastq/"
-bam_suffix = ".bam"
-end_type = "pe"
+
 # =-------DON"T TOUCH ANYTHING PAST THIS POINT ----------------------------
+
+#########---------------
+## Input parameters
+#########---------------
+config_path = "config/sort_pull_config.yaml" # this is for copying later
+
+project_dir = config["project_dir"]
+out_spot = config["out_spot"]
+bam_spot = config["bam_spot"]
+fastq_spot = config["fastq_spot"]
 
 output_dir = os.path.join(project_dir,out_spot)
 bam_dir = os.path.join(project_dir,bam_spot)
-fastq_dir = os.path.join(project_dir, fastq_dir)
+fastq_dir = os.path.join(project_dir, fastq_spot)
 
-SAMPLES, = glob_wildcards(bam_dir + "{sample}" + bam_suffix)
+bam_suffix = config["bam_suffix"]
+end_type = config["end_type"]
+SAMPLES, = glob_wildcards(os.path.join(bam_dir, "{sample}" + bam_suffix))
 print(SAMPLES)
+
+if not os._exists(fastq_dir):
+    os.system("mkdir -p {0}".format(fastq_dir))
+
+if not os._exists(output_dir):
+    os.system("mkdir -p {0}".format(output_dir))
 
 rule all:
   input:
-    expand(fastq_dir + "{sample}_1.merged.fastq.gz", sample = SAMPLES)
+    expand(os.path.join(fastq_dir, "{sample}_1.merged.fastq.gz"), sample = SAMPLES),
+    os.path.join(output_dir, "config_sort_pull.yaml")
 
 rule name_sort:
     input:
-        aligned_bam = bam_dir + "{sample}" + bam_suffix
+        aligned_bam = os.path.join(bam_dir, "{sample}" + bam_suffix)
     output:
-       temp(output_dir + "{sample}_namesorted.bam")
+       temp(os.path.join(output_dir, "{sample}_namesorted.bam"))
     shell:
         """
-        mkdir -p {output_dir}
         samtools sort -n -@ 2 {input.aligned_bam} -o {output}
+        """
+rule copy_config:
+    input:
+        conf = config_path
+    output:
+        os.path.join(output_dir, "config_sort_pull.yaml")
+    shell:
+        """
+        cp {input.conf} {output}
         """
 if end_type == "pe":
   rule bam_to_fastq:
       input:
-          name_sort_bam = output_dir + "{sample}_namesorted.bam"
+          name_sort_bam = os.path.join(output_dir, "{sample}_namesorted.bam")
       output:
-          one = temp(fastq_dir + "{sample}_1.merged.fastq"),
-          two = temp(fastq_dir + "{sample}_2.merged.fastq")
+          one = temp(os.path.join(fastq_dir, "{sample}_1.merged.fastq")),
+          two = temp(os.path.join(fastq_dir, "{sample}_2.merged.fastq"))
       shell:
           """
           bedtools bamtofastq -i {input} \
@@ -44,11 +66,11 @@ if end_type == "pe":
           """
   rule gunzip_fastq:
       input:
-          one = fastq_dir + "{sample}_1.merged.fastq",
-          two = fastq_dir + "{sample}_2.merged.fastq"
+          one = os.path.join(fastq_dir, "{sample}_1.merged.fastq"),
+          two = os.path.join(fastq_dir, "{sample}_2.merged.fastq")
       output:
-          one_out = fastq_dir + "{sample}_1.merged.fastq.gz",
-          two_out = fastq_dir + "{sample}_2.merged.fastq.gz"
+          one_out = os.path.join(fastq_dir, "{sample}_1.merged.fastq.gz"),
+          two_out = os.path.join(fastq_dir, "{sample}_2.merged.fastq.gz")
       shell:
           """
           gzip {input.one}
@@ -57,9 +79,9 @@ if end_type == "pe":
 else:
   rule bam_to_fastq:
       input:
-          name_sort_bam = output_dir + "{sample}_namesorted.bam"
+          name_sort_bam = os.path.join(output_dir, "{sample}_namesorted.bam")
       output:
-          one = temp(fastq_dir + "{sample}_1.merged.fastq")
+          one = temp(os.path.join(fastq_dir, "{sample}_1.merged.fastq"))
       shell:
           """
           bedtools bamtofastq -i {input} \
@@ -67,9 +89,9 @@ else:
           """
   rule gunzip_fastq:
       input:
-          one = fastq_dir + "{sample}_1.merged.fastq"
+          one = os.path.join(fastq_dir, "{sample}_1.merged.fastq")
       output:
-          one_out = fastq_dir + "{sample}_1.merged.fastq.gz"
+          one_out = os.path.join(fastq_dir, "{sample}_1.merged.fastq.gz")
       shell:
           """
           gzip {input.one}
