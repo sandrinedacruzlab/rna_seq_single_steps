@@ -7,7 +7,7 @@ project_dir: "/SAN/vyplab/alb_projects/data/4su_full_ward_tdp_kd_ipsc/"
 out_spot: "salmon"
 fastq_spot: "merged_fastqs"
 
-salmon_strand_info: "-l ISF"
+salmon_strand_info: "A"  # automatic detection
 end_type: "pe"
 threads: 4
 
