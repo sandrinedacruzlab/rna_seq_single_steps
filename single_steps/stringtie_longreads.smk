@@ -1,5 +1,5 @@
 configfile: "config/single_steps_config.yaml"
-include: "../rules/helpers.py"
+include: "/SAN/vyplab/alb_projects/pipelines/rna_seq_snakemake/rules/helpers.py"
 
 import pandas as pd
 import os

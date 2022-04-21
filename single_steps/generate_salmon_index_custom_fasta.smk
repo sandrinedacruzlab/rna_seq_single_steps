@@ -1,7 +1,7 @@
 import os
 configfile: "config/config.yaml"
 cluster_config: "config/cluster.yaml"
-include: "../rules/helpers.py"
+include: "/SAN/vyplab/alb_projects/pipelines/rna_seq_snakemake/rules/helpers.py"
 
 
 CUSTOM_FA = "/SAN/vyplab/alb_projects/data/bilal_mouse/plusHumanAR.gencode.vM22.annotation.gtf.transcripts.fasta"

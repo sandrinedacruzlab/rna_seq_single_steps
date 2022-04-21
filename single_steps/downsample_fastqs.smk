@@ -6,7 +6,7 @@
 
 import os
 import pandas as pd
-include: "../rules/helpers.py"
+include: "/SAN/vyplab/alb_projects/pipelines/rna_seq_snakemake/rules/helpers.py"
 
 sample_tbl_path = "/SAN/vyplab/vyplab_reference_genomes/pipeline_test_data/ward_tiny_fastqs_sample_tbl.csv"
 n_reads = 100000 #100k should be plenty...

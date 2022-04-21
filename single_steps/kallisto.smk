@@ -1,7 +1,7 @@
 import os
 
-configfile: "/SAN/vyplab/alb_projects/pipelines/rna_seq_snakemake/config/config.yaml"
-cluster_config: "/SAN/vyplab/alb_projects/pipelines/rna_seq_snakemake/config/cluster.yaml"
+configfile: "config/config.yaml"
+cluster_config: "config/cluster.yaml"
 include: "/SAN/vyplab/alb_projects/pipelines/rna_seq_snakemake/rules/helpers.py"
 
 kallisto_output_folder = config["project_top_level"] + "kallisto/"
