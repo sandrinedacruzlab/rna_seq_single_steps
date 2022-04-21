@@ -1,0 +1,16 @@
+name: single_steps
+
+channels:
+  - conda-forge
+  - bioconda
+
+dependencies:
+  - python=3.6
+  - samtools=1.11-0
+  - subread=2.0.1-0
+  - stringtie=2.1.4
+  - salmon=1.8.0
+  - bedtools=2.30.0
+  - kallisto=0.44.0
+  - rseqc=4.0.0-0
+  - how_are_we_stranded_here=1.0.1
