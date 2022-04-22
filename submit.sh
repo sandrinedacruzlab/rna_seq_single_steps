@@ -11,9 +11,7 @@
 #$ -j y
 #$ -R y
 
-# source activate /SAN/vyplab/vyplab_reference_genomes/conda_envs/splicing_env/
-
-WORKFLOW="workflows/${1}.smk"
+WORKFLOW="single_steps/${1}.smk"
 
 if [ "$2" != "" ]; then
     RUN_NAME="$1"_"$2"
@@ -24,7 +22,7 @@ fi
 FOLDER=submissions/$(date +"%Y%m%d%H%M")
 
 mkdir -p ${FOLDER}
-cp config/config.yaml ${FOLDER}/${RUN_NAME}_config.yaml
+cp config/${1}_config.yaml ${FOLDER}/${RUN_NAME}_config.yaml
 
 snakemake -s ${WORKFLOW} \
 --conda-prefix "/SAN/vyplab/vyplab_reference_genomes/conda_envs/" \
@@ -36,3 +34,4 @@ snakemake -s ${WORKFLOW} \
 --nolock \
 --rerun-incomplete \
 --latency-wait 100 \
+--keep-going
