@@ -14,3 +14,4 @@ dependencies:
   - kallisto=0.44.0
   - rseqc=4.0.0-0
   - how_are_we_stranded_here=1.0.1
+  - gffread=0.12.7
