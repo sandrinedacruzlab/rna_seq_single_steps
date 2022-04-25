@@ -27,7 +27,7 @@ if not os.path.exists(out_fastq_dir):
 if not os.path.exists(out_temp_dir):
     os.system(f"mkdir -p {out_temp_dir}")
 
-conda: "../envs/single_steps.yaml"
+# conda: "../envs/single_steps.yaml"
 
 localrules: copy_config
 
@@ -78,6 +78,8 @@ if end_type == "pe":
             threads = config["fastq_extra_threads"],
             singletons = os.path.join(out_fastq_dir, "{sample}.singletons.fastq.gz")
 
+        conda: "../envs/single_steps.yaml"
+
         shell:
             """
             samtools fastq \
@@ -100,6 +102,8 @@ else:
         params:
             threads = config["fastq_extra_threads"],
 
+        conda: "../envs/single_steps.yaml"
+
         shell:
             """
             samtools fastq \
@@ -116,9 +120,6 @@ rule copy_config:
                      sample = SAMPLES)
     output:
         os.path.join(out_fastq_dir, "config_sort_pull.yaml")
-
-    conda:
-        None
 
     shell:
         """

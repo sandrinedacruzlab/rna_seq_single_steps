@@ -63,6 +63,8 @@ rule custom_txome_fasta:
         os.path.join(log_subdir,
                      "custom_txome_fasta.log")
 
+    conda: "../envs/single_steps.yaml"
+
     shell:
         """
         gffread \
@@ -134,6 +136,8 @@ rule salmon_index:
         os.path.join(log_subdir,
                      "salmon_index.log")
 
+    conda: "../envs/single_steps.yaml"
+
     shell:
         """
         salmon index \
@@ -166,6 +170,8 @@ rule salmon_quant_pe:
     log:
         os.path.join(log_subdir,
                      "salmon_quant_pe.{sample}.log")
+
+    conda: "../envs/single_steps.yaml"
 
     shell:
         """
@@ -202,6 +208,8 @@ rule salmon_quant_se:
     log:
         os.path.join(log_subdir,
                      "salmon_quant_se.{sample}.log")
+
+    conda: "../envs/single_steps.yaml"
 
     shell:
         """
