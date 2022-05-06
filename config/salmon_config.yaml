@@ -21,6 +21,12 @@ salmon_index_name: gencode_v34
 # Default: 31 (recommended for >= 75bp reads)
 salmon_kmer_size: 31
 
+salmon_strand_info: "A"  # automatic detection
+
+# Extra options passed to Salmon quant (i.e. everything other than input/output & libType)
+# Pass as a list of strings
+salmon_quant_flags: ["--seqBias", "--posBias", "--gcBias"]
+
 # Directory containing input FASTQs
 fastq_dir: tests/pulled_fastq
 # 'pe' for paired-end and 'se' for single-end
@@ -34,7 +40,7 @@ fastq2_suffix: "_2.merged.fastq.gz"
 # Directory to store Salmon quantifications
 out_dir: tests/salmon/
 
-salmon_strand_info: "A"  # automatic detection
+
 
 # Be sure to update config/cluster.yaml to reflect this
 index_threads: 4

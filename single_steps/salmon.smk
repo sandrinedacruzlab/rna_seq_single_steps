@@ -17,6 +17,9 @@ sys.stderr.write(f"Basenames for input FASTQ files - {', '.join(SAMPLES)}\n")
 
 
 assert isinstance(config["generate_fasta"], bool), f"'generate_fasta' must be True/False boolean, {config['generate_fasta']} (type {type(config['generate_fasta'])}) was provided"
+assert isinstance(config["salmon_quant_flags"], list), f"'salmon_quant_flags' must be a list, {config['salmon_quant_flags']} (type {type(config['salmon_quant_flags'])}) was provided"
+assert all((isinstance(x, str) for x in config["salmon_quant_flags"])), f"All elements of 'salmon_quant_flags' must be strings"
+
 assert config["end_type"] in ["pe", "se"], f"'end_type' must be one of 'pe' (paired-end) or 'se' (single_end), {config['end_type']} was passed"
 
 # Double check can find corresponding mate files for fastq2_suffix
@@ -85,6 +88,7 @@ def target_txome_fasta(make_fasta, custom_path):
         return custom_path
 
     else:
+        # Return path to provided file
         return config["transcripts_fasta"]
 
 
@@ -162,7 +166,8 @@ rule salmon_quant_pe:
     params:
         index_dir = os.path.join(salmon_index_dir, salmon_index_name),
         output_dir = os.path.join(out_dir, "{sample}"),
-        libtype = config["salmon_strand_info"]
+        libtype = config["salmon_strand_info"],
+        extra_flags = " ".join(config["salmon_quant_flags"])
 
     threads:
         config["quant_threads"]
@@ -182,9 +187,7 @@ rule salmon_quant_pe:
         --mates2 {input.fast2} \
         --threads {threads} \
         -o {params.output_dir} \
-        --seqBias \
-        --posBias \
-        --gcBias \
+        {params.extra_flags} \
         &> {log}
         """
 
@@ -201,6 +204,7 @@ rule salmon_quant_se:
         index_dir = os.path.join(salmon_index_dir, salmon_index_name),
         output_dir = os.path.join(out_dir, "{sample}"),
         libtype = config["salmon_strand_info"],
+        extra_flags = " ".join(config["salmon_quant_flags"])
 
     threads:
         config["quant_threads"]
@@ -219,8 +223,6 @@ rule salmon_quant_se:
         -r {input.fast1} \
         --threads {threads} \
         -o {params.output_dir} \
-        --seqBias \
-        --posBias \
-        --gcBias \
+        {params.extra_flags} \
         &> {log}
         """
