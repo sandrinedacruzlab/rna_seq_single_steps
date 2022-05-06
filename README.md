@@ -3,7 +3,9 @@
 
 This repo contains a collection of ad-hoc and flexible pipelines for running common bioinformatics tools on a directory of input files.
 
-See [Available Pipelines](#Available-pipelines) section for a list & description of available workflows
+See [Available Pipelines](#Available-pipelines) section for a list & description of available workflows. Well defined/flexible pipelines include:
+- [Salmon transcript quantification](#Salmon)
+- [Pull FASTQs from coordinate-sorted BAM files](#Pull-FASTQs-from-BAM-files)
 
 # Running instructions
 
@@ -14,7 +16,7 @@ snakemake -n -p -s single_steps/<workflow>.smk
 
 # Available pipelines
 
-### Salmon (single_steps/salmon.smk)
+### Salmon
 
 Run [Salmon](https://github.com/COMBINE-lab/salmon) transcript quantification on a directory of input FASTQ files (paired-end or single-end). The workflow can use a pre-provided index or generate an full index with the genome sequence as decoys from provided reference files.
 
@@ -31,7 +33,7 @@ Config file: `config/salmon_config.yaml`
 Cluster config file: `config/cluster/salmon.yaml`
 
 
-### Pull FASTQs from BAM files (single_steps/sort_pull.smk)
+### Pull FASTQs from BAM files
 
 Uses [samtools](https://github.com/samtools/samtools) to sort **input coordinate-sorted BAM** files by read name and extract reads to FASTQ files. Supports single-end or paired-end reads.
 
