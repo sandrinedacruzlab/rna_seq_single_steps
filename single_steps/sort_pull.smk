@@ -52,15 +52,16 @@ rule name_sort:
     output:
         temp(os.path.join(out_temp_dir, "{sample}.namesorted.bam"))
 
-    params:
-        threads = config["collate_extra_threads"]
+    threads:
+        config["collate_extra_threads"] + 1
 
     conda:
         "../envs/single_steps.yaml"
 
     shell:
         """
-        samtools collate -@ {params.threads} \
+        samtools collate \
+        -@ {threads} \
         -o {output} \
         {input.aligned_bam}
         """
@@ -75,10 +76,12 @@ if end_type == "pe":
             two = os.path.join(out_fastq_dir, "{sample}.2.pulled.fastq.gz"),
 
         params:
-            threads = config["fastq_extra_threads"],
             singletons = os.path.join(out_fastq_dir, "{sample}.singletons.fastq.gz")
 
         conda: "../envs/single_steps.yaml"
+
+        threads:
+            config["fastq_extra_threads"] + 1
 
         shell:
             """
@@ -87,7 +90,7 @@ if end_type == "pe":
             -2 {output.two} \
             -s {params.singletons} \
             -N \
-            -@ {params.threads} \
+            -@ {threads} \
             {input}
             """
 
@@ -99,15 +102,15 @@ else:
         output:
             one = os.path.join(out_fastq_dir, "{sample}.1.pulled.fastq.gz")
 
-        params:
-            threads = config["fastq_extra_threads"],
+        threads:
+            config["fastq_extra_threads"] + 1
 
         conda: "../envs/single_steps.yaml"
 
         shell:
             """
             samtools fastq \
-            -@ {params.threads} \
+            -@ {threads} \
             -0 {output.one} \
             {input}
             """

@@ -12,6 +12,6 @@ fastq_spot: tests/pulled_fastq/
 end_type: "pe"
 
 # Number of extra threads to use for samtools collate
-collate_extra_threads: 0
+collate_extra_threads: 1
 # Number of extra threads to use for samtools fastq
-fastq_extra_threads: 0
+fastq_extra_threads: 1
