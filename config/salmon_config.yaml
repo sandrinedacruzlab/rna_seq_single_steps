@@ -37,7 +37,8 @@ out_dir: tests/salmon/
 salmon_strand_info: "A"  # automatic detection
 
 # Be sure to update config/cluster.yaml to reflect this
-threads: 4
+index_threads: 4
+quant_threads: 2
 
 # Name of subdirectory of out_dir to store log/stderr files for each rule
 logs_dir: single_steps_logs/

@@ -130,7 +130,7 @@ rule salmon_index:
         outdir = os.path.join(salmon_index_dir, salmon_index_name, "")
 
     threads:
-        config["threads"]
+        config["index_threads"]
 
     log:
         os.path.join(log_subdir,
@@ -165,7 +165,7 @@ rule salmon_quant_pe:
         libtype = config["salmon_strand_info"]
 
     threads:
-        config["threads"]
+        config["quant_threads"]
 
     log:
         os.path.join(log_subdir,
@@ -203,7 +203,7 @@ rule salmon_quant_se:
         libtype = config["salmon_strand_info"],
 
     threads:
-        config["threads"]
+        config["quant_threads"]
 
     log:
         os.path.join(log_subdir,
