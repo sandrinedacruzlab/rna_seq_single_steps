@@ -14,7 +14,7 @@ snakemake -n -p -s single_steps/<workflow>.smk
 
 # Available pipelines
 
-#### Salmon (single_steps/salmon.smk)
+### Salmon (single_steps/salmon.smk)
 
 Run [Salmon](https://github.com/COMBINE-lab/salmon) transcript quantification on a directory of input FASTQ files (paired-end or single-end). The workflow can use a pre-provided index or generate an full index with the genome sequence as decoys from provided reference files.
 
@@ -31,7 +31,7 @@ Config file: `config/salmon_config.yaml`
 Cluster config file: `config/cluster/salmon.yaml`
 
 
-#### Pull FASTQs from BAM files (single_steps/sort_pull.smk)
+### Pull FASTQs from BAM files (single_steps/sort_pull.smk)
 
 Uses [samtools](https://github.com/samtools/samtools) to sort **input coordinate-sorted BAM** files by read name and extract reads to FASTQ files. Supports single-end or paired-end reads.
 
