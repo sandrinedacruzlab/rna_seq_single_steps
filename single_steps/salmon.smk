@@ -26,7 +26,7 @@ assert config["end_type"] in ["pe", "se"], f"'end_type' must be one of 'pe' (pai
 if config["end_type"] == "pe":
     fq2_samples = [f.replace(fastq2_suffix, "") for f in os.listdir(fastq_dir) if f.endswith(fastq2_suffix)]
 
-    assert SAMPLES == fq2_samples, f"Inconsistent sample names between 'fastq1_suffix' & 'fastq2_suffix' (could not map mate files)"
+    assert sorted(SAMPLES) == sorted(fq2_samples), f"Inconsistent sample names between 'fastq1_suffix' & 'fastq2_suffix' (could not map mate files)"
 
 
 if not os.path.exists(log_subdir):
