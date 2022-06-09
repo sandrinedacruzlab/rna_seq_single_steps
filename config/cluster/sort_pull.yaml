@@ -1,0 +1,15 @@
+__default__:
+    h_vmem: 2G
+    h_rt:   1:0:0
+    submission_string: " "
+    tmem: 2G
+name_sort:
+    submission_string: "-pe smp 2 -R y"
+    h_vmem:   14G
+    tmem:   14G
+    h_rt: 72:00:00
+bam_to_fastq:
+    submission_string: "-pe smp 2 -R y"
+    h_vmem:   14G
+    tmem:   14G
+    h_rt: 72:00:00

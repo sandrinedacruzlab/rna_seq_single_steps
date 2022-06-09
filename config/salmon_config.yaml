@@ -1,14 +1,50 @@
-transcripts: "/SAN/vyplab/vyplab_reference_genomes/sequence/human/gencode/gencode.v34.transcripts.fa"
 
-salmon_index_dir: "/SAN/vyplab/vyplab_reference_genomes/salmon/transcriptome_index"
+gtf: tests/reference/annotations.gtf
 
-# a top level folder where the bams reside
-project_dir: "/SAN/vyplab/alb_projects/data/4su_full_ward_tdp_kd_ipsc/"
-out_spot: "salmon"
-fastq_spot: "merged_fastqs"
+# Whether to generate custom transcriptome fasta (using gffread)
+# True or False (no quotes)
+generate_fasta: True
+
+# Path to FASTA file of transcript sequences. Ignored if generate_fasta: True
+transcripts_fasta: tests/reference/transcripts.fa
+
+# Path to genome sequence FASTA file. Required if generating index from scratch (for decoy sequences/making transcripts fasta)
+genome_fasta: tests/reference/genome.fa
+
+# Top level directory storing salmon indices
+salmon_index_dir: "tests/salmon_index/"
+
+# Name of subdirectory of salmon_index_dir in which to store/find annotation-specific index
+salmon_index_name: gencode_v34
+
+# kmer-size for salmon index (= minimum acceptable length for valid match)
+# Default: 31 (recommended for >= 75bp reads)
+salmon_kmer_size: 31
 
 salmon_strand_info: "A"  # automatic detection
-end_type: "pe"
-threads: 4
 
-gtf: "/SAN/vyplab/vyplab_reference_genomes/annotation/human/GRCh38/gencode.v34.annotation.gtf"
+# Extra options passed to Salmon quant (i.e. everything other than input/output & libType)
+# Pass as a list of strings
+salmon_quant_flags: ["--seqBias", "--posBias", "--gcBias"]
+
+# Directory containing input FASTQs
+fastq_dir: tests/pulled_fastq
+# 'pe' for paired-end and 'se' for single-end
+end_type: "pe"
+# Suffix to strip from FASTQs in fastq_dir to get sample names
+fastq1_suffix: "_1.merged.fastq.gz"
+
+# Suffix for 2nd mate of read pairs. Only used if end_type: pe
+fastq2_suffix: "_2.merged.fastq.gz"
+
+# Directory to store Salmon quantifications
+out_dir: tests/salmon/
+
+
+
+# Be sure to update config/cluster.yaml to reflect this
+index_threads: 4
+quant_threads: 2
+
+# Name of subdirectory of out_dir to store log/stderr files for each rule
+logs_dir: single_steps_logs/

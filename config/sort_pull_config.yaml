@@ -1,8 +1,17 @@
-# a top level folder where the bams reside
-project_dir: "/home/annbrown/data/ursa_mouse"
-out_spot: "name_sortbams/"
-bam_spot: "ori_bams/"
-fastq_spot: "pulled_fastq/"
-
+# Directory containing input BAMs from which to extract FASTQs
+input_dir: tests/test_data/
 bam_suffix: ".bam"
+
+# Directory to store temporary name-sorted BAM files
+temp_dir: tests/temp_name_sort_dir/
+
+# Where to output pulled FASTQs
+fastq_spot: tests/pulled_fastq/
+
+# 'pe' for paired-end, 'se' for single-end
 end_type: "pe"
+
+# Number of extra threads to use for samtools collate
+collate_extra_threads: 1
+# Number of extra threads to use for samtools fastq
+fastq_extra_threads: 1

@@ -11,9 +11,16 @@
 #$ -j y
 #$ -R y
 
-# source activate /SAN/vyplab/vyplab_reference_genomes/conda_envs/splicing_env/
 
-WORKFLOW="workflows/${1}.smk"
+if [[ ( $@ == "--help") ||  $@ == "-h" ]]; then
+    echo "Usage: source submit.sh SMK_NAME RUN_NAME"
+    echo "SMK_NAME - Name of snakemake file (without .smk extension) under single_steps/ to run on cluster"
+    echo "RUN_NAME - Optional argument to name run. Config file for run will be copied to folder containing cluster log files (.submissions/<date><time>/) with run name prefixed"
+    echo "-h/--help - print this help message and exit"
+    exit 0
+fi
+
+WORKFLOW="single_steps/${1}.smk"
 
 if [ "$2" != "" ]; then
     RUN_NAME="$1"_"$2"
@@ -24,15 +31,16 @@ fi
 FOLDER=submissions/$(date +"%Y%m%d%H%M")
 
 mkdir -p ${FOLDER}
-cp config/config.yaml ${FOLDER}/${RUN_NAME}_config.yaml
+cp config/${1}_config.yaml ${FOLDER}/${RUN_NAME}_${1}_config.yaml
 
 snakemake -s ${WORKFLOW} \
 --conda-prefix "/SAN/vyplab/vyplab_reference_genomes/conda_envs/" \
 --use-conda \
 --jobscript cluster_qsub.sh \
---cluster-config config/cluster.yaml \
+--cluster-config config/cluster/${1}.yaml \
 --cluster-sync "qsub -l tmem={cluster.tmem},h_vmem={cluster.h_vmem},h_rt={cluster.h_rt} -o $FOLDER {cluster.submission_string}" \
 -j 40 \
 --nolock \
 --rerun-incomplete \
 --latency-wait 100 \
+--keep-going

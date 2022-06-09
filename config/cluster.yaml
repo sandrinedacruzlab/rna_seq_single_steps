@@ -90,14 +90,14 @@ salmon_index:
     h_rt: 24:00:00
 salmon_quant_pe:
     submission_string: "-pe smp 4 -R y"
-    h_vmem:   8G
-    tmem:   8G
+    h_vmem:   10G
+    tmem:   10G
     smp: 4
     h_rt: 72:00:00
 salmon_quant_se:
     submission_string: "-pe smp 4 -R y"
-    h_vmem:   8G
-    tmem:   8G
+    h_vmem:   10G
+    tmem:   10G
     smp: 4
     h_rt: 72:00:00
 scallop_per_samp:
@@ -150,4 +150,11 @@ feature_counts:
     h_vmem:   8G
     tmem:   8G
     h_rt: 72:00:00
-
+custom_txome_fasta:
+    h_vmem:   8G
+    tmem:   8G
+    h_rt: 24:00:00
+generate_full_decoys:
+    h_vmem:   10G
+    tmem:   10G
+    h_rt: 24:00:00
