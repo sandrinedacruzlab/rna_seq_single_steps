@@ -20,11 +20,11 @@ fi
 FOLDER=$(date +"%Y%m%d%H%M")
 WRITEFOLDER=../submissions/$FOLDER
 mkdir -p $WRITEFOLDER
-cp single_steps/sort_pull.smk $WRITEFOLDER/sort_pull.smk
+cp single_steps/samtools_stats.smk $WRITEFOLDER/samtools_stats.smk
 
-snakemake -s single_steps/sort_pull.smk \
+snakemake -s single_steps/samtools_stats.smk \
 --jobscript cluster_qsub.sh \
---cluster-config config/cluster/sort_pull.yaml \
+--cluster-config config/cluster/samtools_stats.yaml \
 --cluster-sync "qsub -l tmem={cluster.tmem},h_vmem={cluster.h_vmem},h_rt={cluster.h_rt} -o $FOLDER {cluster.submission_string}" \
 -j 40 \
 --nolock \

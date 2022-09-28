@@ -1,0 +1,20 @@
+# Directory containing input BAMs from which to extract FASTQs
+input_dir: tests/test_data/
+bam_suffix: ".bam"
+
+# Directory to store output of samtools stats
+output_dir: tests/test_data/
+
+# Name of tab-separated summary output table of the 'SN:' section of samtools stats output
+# file_name | metric | value
+summary_out_file: samtools_stats_sn_summary.tsv
+
+# Number of extra threads to use for samtools stats
+# Set to 0 if want to run single threaded and update config/cluster/samtools_stats.yaml if submitting to UCL CS cluster
+stats_extra_threads: 1
+
+# -p, --remove-overlaps : Remove overlaps of paired-end reads from coverage and base count computations.
+# True: Pass flag, False to not pass the flag (no quotes - has to be interpreted as a boolean)
+remove_pe_overlaps: True
+
+log_dir: samtools_stats_log/

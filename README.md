@@ -6,6 +6,7 @@ This repo contains a collection of ad-hoc and flexible pipelines for running com
 See [Available Pipelines](#Available-pipelines) section for a list & description of available workflows. Well defined/flexible pipelines include:
 - [Salmon transcript quantification](#Salmon)
 - [Pull FASTQs from coordinate-sorted BAM files](#Pull-FASTQs-from-BAM-files)
+- [Generate summary statistics from BAM files with samtools stats](#Generate-summary-statistics-from-BAM-files-with-samtools-stats)
 
 # Running instructions
 
@@ -44,3 +45,16 @@ Snakefile: `single_steps/sort_pull.smk`
 Config file: `config/sort_pull_config.yaml`
 
 Cluster config file: `config/cluster/sort_pull.yaml`
+
+
+### Generate summary statistics from BAM files with samtools stats
+
+Runs `samtools stats over a set of input BAM files`. Also collapses the 'summary/SN section' into a single summary table for all samples. See [documentation](http://www.htslib.org/doc/samtools-stats.html) for a full breakdown/description of calculated metrics.
+
+Snakefile: `single_steps/samtools_stats.smk`
+
+Config file: `config/samtools_stats_config.yaml`
+
+Cluster config file: `config/cluster/samtools_stats.yaml`
+
+Note: Requires pandas to be installed outside of pipeline, which is usually satisfied by a standard snakemake installation.
