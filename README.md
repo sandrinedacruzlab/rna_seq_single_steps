@@ -49,7 +49,7 @@ Cluster config file: `config/cluster/sort_pull.yaml`
 
 ### Generate summary statistics from BAM files with samtools stats
 
-Runs `samtools stats over a set of input BAM files`. Also collapses the 'summary/SN section' into a single summary table for all samples. See [documentation](http://www.htslib.org/doc/samtools-stats.html) for a full breakdown/description of calculated metrics.
+Runs `samtools stats` over a set of input BAM files. Also collapses the 'summary/SN section' into a single summary table for all samples. See [documentation](http://www.htslib.org/doc/samtools-stats.html) for a full breakdown/description of calculated metrics.
 
 Snakefile: `single_steps/samtools_stats.smk`
 
