@@ -29,4 +29,6 @@ snakemake -s single_steps/nanostat.smk \
 -j 40 \
 --nolock \
 --rerun-incomplete \
---latency-wait 100
+--latency-wait 100 \
+--use-singularity \
+--singularity-args "-B /SAN/vyplab/"
