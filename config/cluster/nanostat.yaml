@@ -1,0 +1,10 @@
+__default__:
+    h_vmem: 4G
+    h_rt:   1:0:0
+    submission_string: " "
+    tmem: 4G
+nanostat:
+    submission_string: "-pe smp 2 -R y"
+    h_vmem:   14G
+    tmem:   14G
+    h_rt: 24:00:00

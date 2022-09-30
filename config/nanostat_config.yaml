@@ -1,0 +1,17 @@
+# Directory containing input long-read BAMs
+input_dir: tests/test_data/
+bam_suffix: ".bam"
+
+# Directory to store output of samtools stats
+output_dir: tests/test_data/
+
+# Name of tab-separated summary output table of the per-sample NanoStat TSV outputs
+# sample_name | Metrics | dataset
+summary_out_file: all_samples.nanostat_summary.tsv
+
+# Number of threads to use to run nanostat
+# Set to 1 if want to run single threaded and update config/cluster/nanostat.yaml if submitting to UCL CS cluster
+nanostat_threads: 2
+
+# Name of subdirectory under output_dir in which to store per-rule logs
+log_dir: nanostat_log/
