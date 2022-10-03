@@ -20,7 +20,7 @@ def main(in_dir, suffix, out_file):
     assert len(samples2path) != 0, f"No files found in {in_dir} with suffix {suffix}"
 
     # Read in TSVs into dataframes
-    dfs = {sample: pd.read_csv(path, sep="\t", header=None)
+    dfs = {sample: pd.read_csv(path, sep="\t")
            for sample, path in samples2path.items()}
 
     # Concat into a single df, appending the sample name as a column
