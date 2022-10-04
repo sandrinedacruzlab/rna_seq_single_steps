@@ -1,0 +1,16 @@
+# Directory containing input BAMs from which to extract FASTQs
+input_dir: tests/test_data/
+bam_suffix: ".bam"
+
+# BED file containing regions to extract overlapping reads from input BAM file
+regions_bed_file: tests/test_data/regions.bed
+
+# Directory to store filtered_bam output of samtools stats
+output_dir: tests/test_data/
+
+# Number of extra threads to use for samtools view (filtering operation)
+# Set to 0 if want to run single threaded and update config/cluster/samtools_stats.yaml if submitting to UCL CS cluster
+samtools_extra_threads: 1
+
+
+log_dir: filter_bam_region_log/
