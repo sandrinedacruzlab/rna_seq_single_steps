@@ -1,9 +1,14 @@
-# Directory containing input BAMs from which to extract FASTQs
+# Directory containing input BAMs to filter
 input_dir: tests/test_data/
+# suffix to identify input files and strip from filename to get sample name
 bam_suffix: ".bam"
 
 # BED file containing regions to extract overlapping reads from input BAM file
 regions_bed_file: tests/test_data/regions.bed
+
+# suffix to add to sample names for filtered BAM files 
+# MUST end in '.bam'
+filtered_bam_suffix: ".regions.bam"
 
 # Directory to store filtered_bam output of samtools stats
 output_dir: tests/test_data/

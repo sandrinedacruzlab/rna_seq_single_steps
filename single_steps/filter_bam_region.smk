@@ -9,6 +9,9 @@ out_dir = os.path.join(config["output_dir"], "")
 log_dir = os.path.join(config["output_dir"], config["log_dir"], "")
 
 bam_suffix = config["bam_suffix"]
+out_bam_suffix = config["filtered_bam_suffix"]
+
+assert out_bam_suffix.endswith(".bam"), f"output bam suffix (config['filtered_bam_suffix']) must end in '.bam', following passed - {out_bam_suffix}"
 
 SAMPLES = [f.replace(bam_suffix, "") for f in os.listdir(in_bam_dir) if f.endswith(bam_suffix)]
 
@@ -16,12 +19,14 @@ SAMPLES = [f.replace(bam_suffix, "") for f in os.listdir(in_bam_dir) if f.endswi
 for s in SAMPLES:
     assert os.path.exists(os.path.join(in_bam_dir, s + bam_suffix + ".bai")), f".bai index file does not exist at same location as input BAM file for sample {s}"
 
+sys.stderr.write(f"Inferred sample names for input BAM files - {', '.join(SAMPLES)}\n")
+
 
 rule all:
     input:
-        expand(os.path.join(out_dir, "{sample}.regions.bam"),
+        expand(os.path.join(out_dir, "{sample}" + out_bam_suffix),
                sample=SAMPLES),
-        expand(os.path.join(out_dir, "{sample}.regions.bam.bai"),
+        expand(os.path.join(out_dir, "{sample}" + out_bam_suffix + ".bai"),
                sample=SAMPLES),
 
 
@@ -32,7 +37,7 @@ rule subset_bam:
         bed = config["regions_bed_file"]
 
     output:
-        bam = os.path.join(out_dir, "{sample}.regions.bam")
+        bam = os.path.join(out_dir, "{sample}" + out_bam_suffix)
 
     params:
         extra_threads = config["samtools_extra_threads"]
@@ -52,8 +57,7 @@ rule subset_bam:
         -L {input.bed} \
         -o {output.bam} \
         --threads {params.extra_threads} \
-        {input.bam} \
-
+        {input.bam} 2> {log}
         """
 
 
@@ -62,7 +66,7 @@ rule index_bam:
         rules.subset_bam.output.bam
 
     output:
-        os.path.join(out_dir, "{sample}.regions.bam.bai")
+        os.path.join(out_dir, "{sample}" + out_bam_suffix + ".bai")
 
     log:
         os.path.join(log_dir, "{sample}.index_bam.log")
