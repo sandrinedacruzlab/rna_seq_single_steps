@@ -7,7 +7,7 @@ See [Available Pipelines](#Available-pipelines) section for a list & description
 - [Salmon transcript quantification](#Salmon)
 - [Pull FASTQs from coordinate-sorted BAM files](#Pull-FASTQs-from-BAM-files)
 - [Generate summary statistics from BAM files with samtools stats](#Generate-summary-statistics-from-BAM-files-with-samtools-stats)
-- [Infer strandedness of RNA-seq reads from BAM files with infer_experiment.py](#Infer-strandedness-of-an-RNAseq-experiment-from-BAM-files-with-infer_experiment.py)
+- [Infer strandedness of RNA-seq reads from BAM files with infer_experiment.py](#Infer-strandedness-of-an-RNAseq-experiment-from-BAM-files-with-infer_experimentpy)
 
 # Running instructions
 
