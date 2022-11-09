@@ -7,6 +7,7 @@ See [Available Pipelines](#Available-pipelines) section for a list & description
 - [Salmon transcript quantification](#Salmon)
 - [Pull FASTQs from coordinate-sorted BAM files](#Pull-FASTQs-from-BAM-files)
 - [Generate summary statistics from BAM files with samtools stats](#Generate-summary-statistics-from-BAM-files-with-samtools-stats)
+- [Infer strandedness of RNA-seq reads from BAM files with infer_experiment.py](#Infer-strandedness-of-an-RNA-seq-experiment-from-BAM-files-with-infer_experiment.py)
 
 # Running instructions
 
@@ -58,3 +59,18 @@ Config file: `config/samtools_stats_config.yaml`
 Cluster config file: `config/cluster/samtools_stats.yaml`
 
 Note: Requires pandas to be installed outside of pipeline, which is usually satisfied by a standard snakemake installation.
+
+
+### Infer strandedness of an RNA-seq experiment from BAM files with infer_experiment.py
+
+Runs RSeQC's `infer_experiment.py` over a set of input BAM files to infer the 'strandedness' of the input RNA reads. Also requires transcript annotation in BED12 format, which can be generated from a GTF file using the recipe in `single_steps/gtf_to_bed12.smk`.
+
+See [Documentation](https://rseqc.sourceforge.net/#infer-experiment-py) for interpretation of the output files. The following blog posts are also handy for translating the definition to the correct parameter for popular RNA-seq tools - [1](https://rnabio.org/module-09-appendix/0009/12/01/StrandSettings/), [2](https://littlebitofdata.com/en/2017/08/strandness_in_rnaseq/).
+
+Snakefile: `single_steps/infer_experiment.smk`
+
+Config file: `config/infer_experiment_config.yaml`
+
+Cluster config file: `config/cluster/infer_experiment.yaml`
+
+Command to submit to UCL cluster: `source submit.sh infer_experiment <optional_run_name>`
