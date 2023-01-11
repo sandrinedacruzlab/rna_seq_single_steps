@@ -1,26 +1,25 @@
-configfile: "config/single_steps_config.yaml"
+configfile: "config/feature_counts_config.yaml"
 import os
 
 
-options_dict = config["feature_counts"]
-config_path = "config/single_steps_config.yaml" # this is for copying later
+
+config_path = "config/feature_counts_config.yaml" # this is for copying later
 
 
 # project_dir = "/SAN/vyplab/alb_projects/data/linked_buratti_hnrnpk/"
-out_spot = options_dict["out_spot"]
-bam_spot = options_dict["bam_spot"]
+out_spot = config["out_spot"]
+bam_spot = config["bam_spot"]
 
 # mouse and human gtf, comment dependening on your species
 # gtf =  "/SAN/vyplab/vyplab_reference_genomes/annotation/mouse/gencode/gencode.vM22.annotation.gtf"
 # gtf =  "/SAN/vyplab/vyplab_reference_genomes/annotation/human/GRCh38/gencode.v31.annotation.gtf"
-gtf = options_dict["gtf"]
+gtf = config["gtf"]
 
-feature_counts_strand_info = options_dict["feature_counts_strand_info"]
-end_type = options_dict["end_type"]
-bam_suffix = options_dict["bam_suffix"]
+feature_counts_strand_info = config["feature_counts_strand_info"]
+end_type = config["end_type"]
+bam_suffix = config["bam_suffix"]
 
 # =-------DON"T TOUCH ANYTHING PAST THIS POINT ----------------------------
-feature_counts_path = options_dict["feature_counts_path"]
 
 output_dir = os.path.join(out_spot, "")
 bam_dir = os.path.join(bam_spot, "")
@@ -38,8 +37,8 @@ localrules: all, copy_config
 rule all:
   input:
     expand(output_dir + "{sample}_featureCounts_results.txt", sample = SAMPLES),
-    os.path.join(output_dir, "config.yaml")
-if options_dict["gtf_used"]: 
+    os.path.join(output_dir, "feature_counts_config.yaml")
+if config["gtf_used"]:
     rule feature_counts:
         input:
             aligned_bam = os.path.join(bam_dir,"{sample}" + bam_suffix)
@@ -50,17 +49,19 @@ if options_dict["gtf_used"]:
         params:
             ref_anno = gtf,
             stranded = feature_counts_strand_info,
-            feature_counts = feature_counts_path,
-            feature_type = options_dict["feature_type"], # exons extracted for counting from ref_anno
-            attr_type = options_dict["attribute_type"], # Generate meta-features for counting via this group/id
+            feature_type = config["feature_type"], # exons extracted for counting from ref_anno
+            attr_type = config["attribute_type"], # Generate meta-features for counting via this group/id
             extra_attr = ",".join(["gene_name"]), # extra metadata to extract & report in count output
-            count_level = "-f" if options_dict["count_at"] == "feature" else "", # count at exon or gene level?
+            count_level = "-f" if config["count_at"] == "feature" else "", # count at exon or gene level?
             paired_end = "-p" if end_type == "pe" else "", #count fragments if paired end
-            long_reads = "-L" if options_dict["long_reads"] else "" # turn on/off long reads setting
+            long_reads = "-L" if config["long_reads"] else "" # turn on/off long reads setting
+
+        container:
+            "docker://quay.io/biocontainers/subread:2.0.3--h7132678_0"
 
         shell:
             """
-            {params.feature_counts} \
+            featureCounts \
             -a {params.ref_anno} \
             -t {params.feature_type} \
             -g {params.attr_type} \
@@ -81,15 +82,17 @@ else:
             out_name = os.path.join(output_dir, "{sample}_featureCounts_results.txt")
 
         params:
-            ref_anno = options_dict["saf"],
+            ref_anno = config["saf"],
             stranded = feature_counts_strand_info,
-            feature_counts = feature_counts_path,
             paired_end = "-p" if end_type == "pe" else "", #count fragments if paired end
-            long_reads = "-L" if options_dict["long_reads"] else "" # turn on/off long reads setting
+            long_reads = "-L" if config["long_reads"] else "" # turn on/off long reads setting
+
+        container:
+            "docker://quay.io/biocontainers/subread:2.0.3--h7132678_0"
 
         shell:
             """
-            {params.feature_counts} \
+            featureCounts \
             -a {params.ref_anno} \
             -F SAF \
             {params.paired_end} \
@@ -105,7 +108,7 @@ rule copy_config:
         conf = config_path
 
     output:
-        os.path.join(output_dir, "config.yaml")
+        os.path.join(output_dir, "feature_counts_config.yaml")
 
     shell:
         """
