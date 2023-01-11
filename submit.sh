@@ -30,9 +30,9 @@ else
 fi
 
 if [ "$3" != "" ]; then
-    SINGULARITY=""
+    SINGULARITY="--use-singularity"
 else
-    SINGULARITY=$3
+    SINGULARITY=""
 fi
 
 FOLDER=submissions/$(date +"%Y%m%d%H%M")
