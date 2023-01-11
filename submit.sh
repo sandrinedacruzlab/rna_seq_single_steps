@@ -13,9 +13,10 @@
 
 
 if [[ ( $@ == "--help") ||  $@ == "-h" ]]; then
-    echo "Usage: source submit.sh SMK_NAME RUN_NAME"
+    echo "Usage: source submit.sh SMK_NAME (RUN_NAME) (--use-singularity)"
     echo "SMK_NAME - Name of snakemake file (without .smk extension) under single_steps/ to run on cluster"
     echo "RUN_NAME - Optional argument to name run. Config file for run will be copied to folder containing cluster log files (.submissions/<date><time>/) with run name prefixed"
+    echo "--use-singularity - Optional argument to use Singularity containers with single step. Required for pipelines that include a 'container' declaration"
     echo "-h/--help - print this help message and exit"
     exit 0
 fi
@@ -28,6 +29,12 @@ else
     RUN_NAME=$1
 fi
 
+if [ "$3" != "" ]; then
+    SINGULARITY=""
+else
+    SINGULARITY=$3
+fi
+
 FOLDER=submissions/$(date +"%Y%m%d%H%M")
 
 mkdir -p ${FOLDER}
@@ -36,6 +43,7 @@ cp config/${1}_config.yaml ${FOLDER}/${RUN_NAME}_${1}_config.yaml
 snakemake -s ${WORKFLOW} \
 --conda-prefix "/SAN/vyplab/vyplab_reference_genomes/conda_envs/" \
 --use-conda \
+${SINGULARITY} \
 --jobscript cluster_qsub.sh \
 --cluster-config config/cluster/${1}.yaml \
 --cluster-sync "qsub -l tmem={cluster.tmem},h_vmem={cluster.h_vmem},h_rt={cluster.h_rt} -o $FOLDER {cluster.submission_string}" \
