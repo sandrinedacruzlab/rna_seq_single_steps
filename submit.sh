@@ -15,7 +15,7 @@
 if [[ ( $@ == "--help") ||  $@ == "-h" ]]; then
     echo "Usage: source submit.sh SMK_NAME RUN_NAME"
     echo "SMK_NAME - Name of snakemake file (without .smk extension) under single_steps/ to run on cluster"
-    echo "RUN_NAME - Optional argument to name run. Config file for run will be copied to folder containing cluster log files (.submissions/<date><time>/) with run name prefixed"
+    echo "RUN_NAME - Optional argument to name run. Config file for run will be copied to folder containing cluster log files (submissions/<date><time>/) with run name prefixed"
     echo "-h/--help - print this help message and exit"
     exit 0
 fi
