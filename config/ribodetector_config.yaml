@@ -1,0 +1,47 @@
+# Define input data type: 'pe' (paired-end) or 'se' (single-end)
+end_type: pe
+
+# Directory containing FASTQ files
+fastq_dir: "tests/test_data"
+
+# Suffix for the first read file. Must be populated regardless of end_type value
+fastq1_suffix:  "_1.merged.fastq.gz"
+
+# Suffix for the second read file. Only used if end_type: pe
+fastq2_suffix: "_2.merged.fastq.gz"
+
+# Output directory for storing results
+out_dir: tests/ribodetector
+
+# suffix to add to output sequence files after rRNAs removal (_filtered) and for detected rRNAs (_detected)
+# Compression inferred from suffix, remove .gz if want uncompressed
+out_suffix_filtered: ".ribodetector.rrna_removed.fastq.gz"
+out_suffix_detected: ".ribodetector.rrna_detected.fastq.gz"
+
+read1_num_suffix: _1
+read2_num_suffix: _2
+
+# Sequencing read length (mean length). Note: Accuracy reduces for reads shorter than 40.
+read_length: 100
+
+# Ensure which classification has high confidence for paired-end reads:
+# - 'norrna': Output only high confident non-rRNAs, classify the rest as rRNAs.
+# - 'rrna': Output only high confident rRNAs, classify the rest as non-rRNAs.
+# - 'both': Output both non-rRNA and rRNA predictions with high confidence.
+# - 'none': Give label based on the mean probability of read pair. (Only applicable for paired end reads, discard the read pair when their predictions are discordant)
+# This parameter is only necessary for paired end reads. When setting to rrna, the paired read ends will be predicted as rRNA only if both ends were classified as rRNA. If you want to identify or remove rRNAs with high confidence, you should set it to rrna. Conversely, norrna will predict the read pair as nonrRNA only if both ends were classified as nonrRNA. This setting will only output nonrRNAs with high confidence. both will discard the read pairs with two ends classified inconsistently, only pairs with concordant prediction will be reported in the corresponding output. none will take the mean of the probabilities of both ends and decide the final prediction. This is also the default setting.
+ensure: rrna
+
+# Number of threads to use for processing (make sure to match with config/cluster/ribodetector.yaml)
+threads: 4
+
+# Chunk size (in number of reads) to load into memory each time.
+# When chunk_size=1000 and threads=20, consumes approximately 20 GB of memory.
+# It's recommended to use values that are multiples of the number of threads.
+chunk_size: 3000
+
+
+# Name of subdirectory of out_dir to store log/stderr files for each rule
+logs_dir: single_steps_logs/
+
+
