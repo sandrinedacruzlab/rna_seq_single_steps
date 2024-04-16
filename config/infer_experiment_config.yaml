@@ -1,0 +1,17 @@
+# Directory containing input BAMs to infer_experiment
+input_dir: tests/test_data
+bam_suffix: ".bam"
+
+# Directory to store output of rseqc's infer_experiment.py
+output_dir: tests/test_data
+#
+bed12: tests/test_data/annotation.bed12
+
+# Number of reads to sample from BAM to infer strandedness
+sample_size: 200000
+
+# min map qual to be considered 'uniquely mapped'
+min_qual: 30
+
+# name of subdirectory under output_dir to store stderr outputs
+log_dir: infer_experiment_logs/
