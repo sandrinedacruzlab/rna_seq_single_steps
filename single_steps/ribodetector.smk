@@ -14,6 +14,12 @@ SAMPLES = [f.replace(fastq1_suffix, "") for f in os.listdir(fastq_dir) if f.ends
 if not os.path.exists(log_subdir):
     os.system(f"mkdir -p {log_subdir}")
 
+# make output filtered fastq subdirectories to prevent ribodetector error
+for subdir in ["nonrrna", "rrna"]:
+    if not os.path.exists(os.path.join(out_dir, subdir)):
+        os.system(f"mkdir -p {os.path.join(out_dir, subdir)}")
+
+
 # Double check can find corresponding mate files for fastq2_suffix
 if config["end_type"] == "pe":
     fq2_samples = [f.replace(fastq2_suffix, "") for f in os.listdir(fastq_dir) if f.endswith(fastq2_suffix)]
@@ -47,9 +53,12 @@ def get_sample_fastqs(sample, fq_dir, end_type, fq1_suffix, fq2_suffix):
 fq1_targets = expand(os.path.join(out_dir, "nonrrna", "{sample}" + config["read1_num_suffix"] + config["out_suffix_filtered"]), sample=SAMPLES)
 fq2_targets = expand(os.path.join(out_dir, "nonrrna", "{sample}" + config["read2_num_suffix"] + config["out_suffix_filtered"]), sample=SAMPLES)
 
+localrules: parse_logfiles
+
 rule all:
     input:
-        fq1_targets + fq2_targets if config["end_type"] == "pe" else fq1_targets
+        fq1_targets + fq2_targets if config["end_type"] == "pe" else fq1_targets,
+        os.path.join(out_dir, "ribodetector_filtered_counts.tsv")
 
 
 rule ribodetector_cpu_pe:
@@ -59,7 +68,8 @@ rule ribodetector_cpu_pe:
     output:
         # Dynamic output files based on input sample names
         nonrna_fq1=os.path.join(out_dir, "nonrrna", "{sample}" + config["read1_num_suffix"] + config["out_suffix_filtered"]),
-        nonrna_fq2=os.path.join(out_dir, "nonrrna", "{sample}" + config["read2_num_suffix"] + config["out_suffix_filtered"])
+        nonrna_fq2=os.path.join(out_dir, "nonrrna", "{sample}" + config["read2_num_suffix"] + config["out_suffix_filtered"]),
+        logf=os.path.join(log_subdir, "ribodetector.{sample}.log")
     params:
         length=config["read_length"],  # Example read length
         ensure=config["ensure"],  # Classification mode
@@ -80,7 +90,7 @@ rule ribodetector_cpu_pe:
         ribodetector_cpu \
         -l {params.length} \
         -i {input} \
-        -o {output} \
+        -o {output.nonrna_fq1} {output.nonrna_fq2} \
         -r {params.rrna_output} \
         -e {params.ensure} \
         -t {params.threads} \
@@ -95,7 +105,8 @@ rule ribodetector_cpu_se:
         lambda wildcards: get_sample_fastqs(wildcards.sample, fastq_dir, config["end_type"], fastq1_suffix, fastq2_suffix)
 
     output:
-        nonrna_fq1=os.path.join(out_dir, "nonrrna", "{sample}" + config["read1_num_suffix"] + config["out_suffix_filtered"])
+        nonrna_fq1=os.path.join(out_dir, "nonrrna", "{sample}" + config["read1_num_suffix"] + config["out_suffix_filtered"]),
+        logf=os.path.join(log_subdir, "ribodetector.{sample}.log")
     params:
         length=config["read_length"],  # Example read length
         ensure=config["ensure"],  # Classification mode
@@ -116,7 +127,7 @@ rule ribodetector_cpu_se:
         ribodetector_cpu \
         -l {params.length} \
         -i {input} \
-        -o {output} \
+        -o {output.fq1} \
         -r {params.rrna_output} \
         -e {params.ensure} \
         -t {params.threads} \
@@ -125,3 +136,16 @@ rule ribodetector_cpu_se:
         2> {log.stderr}
         """
 
+rule parse_logfiles:
+    input:
+        logfs = expand(os.path.join(log_subdir, "ribodetector.{sample}.log"), sample=SAMPLES)
+
+    output:
+        os.path.join(out_dir, "ribodetector_filtered_counts.tsv")
+
+    shell:
+        """
+        python scripts/parse_ribodetector_logs.py \
+        -o {output} \
+        {input}
+        """
