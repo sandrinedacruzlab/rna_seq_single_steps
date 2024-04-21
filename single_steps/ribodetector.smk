@@ -76,7 +76,7 @@ rule ribodetector_cpu_pe:
         threads=config["threads"],  # Number of threads
         chunk_size=config["chunk_size"],  # Chunk size for memory management
         log=os.path.join(log_subdir, "ribodetector.{sample}.log"),  # Log file for each sample
-        rrna_output = [os.path.join(out_dir, "rrna", "{sample}" + config["read1_num_suffix"] + config["out_suffix_filtered"]), #  putting here as non-essential
+        rrna_output = [os.path.join(out_dir, "rrna", "{sample}" + config["read1_num_suffix"] + config["out_suffix_detected"]), #  putting here as non-essential
                        os.path.join(out_dir, "rrna", "{sample}" + config["read2_num_suffix"] + config["out_suffix_detected"])]
 
     log:
@@ -113,7 +113,7 @@ rule ribodetector_cpu_se:
         threads=config["threads"],  # Number of threads
         chunk_size=config["chunk_size"],  # Chunk size for memory management
         log=os.path.join(log_subdir, "ribodetector.{sample}.log"),  # Log file for each sample
-        rrna_output = [os.path.join(out_dir, "rrna", "{sample}" + config["read1_num_suffix"] + config["out_suffix_filtered"]), #  putting here as non-essential
+        rrna_output = [os.path.join(out_dir, "rrna", "{sample}" + config["read1_num_suffix"] + config["out_suffix_detected"]), #  putting here as non-essential
                        os.path.join(out_dir, "rrna", "{sample}" + config["read2_num_suffix"] + config["out_suffix_detected"])]
 
     log:
