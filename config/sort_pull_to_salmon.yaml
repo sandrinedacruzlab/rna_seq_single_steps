@@ -1,0 +1,40 @@
+# Additional parameters
+project_dir: /SAN/vyplab/NYGC_ALSFTD/  # Placeholder added
+# Directory containing input BAMs from which to extract FASTQs
+input_dir: /SAN/vyplab/NYGC_ALSFTD/NYGC_BAMS_LINKED_NEWER/
+bam_suffix: ".bam"
+
+
+salmon_out: /SAN/vyplab/NYGC_ALSFTD/salmon_full/  # Placeholder added
+fastq_spot: /SAN/vyplab/NYGC_ALSFTD/pulled_fastq_nygc/
+gtf: /SAN/vyplab/vyplab_reference_genomes/gtf/gencode.v42.gtf  # Placeholder added
+# Directory to store temporary name-sorted BAM files
+temp_dir: /SAN/vyplab/NYGC_ALSFTD/temp_name_sort_dir/
+
+# 'pe' for paired-end, 'se' for single-end
+end_type: "pe"
+salmon_strand_info: "ISF"  # infer_experiment 1++,1–,2+-,2-+ ISF
+# Number of extra threads to use for samtools collate
+collate_extra_threads: 1
+# Number of extra threads to use for samtools fastq
+fastq_extra_threads: 1
+
+salmon_index_dir: /SAN/vyplab/vyplab_reference_genomes/salmon/human_v42/GRCh38/full/gencode_v42.kmer_31/
+
+# Directory containing input FASTQs
+fastq_dir: tests/pulled_fastq
+# 'pe' for paired-end and 'se' for single-end
+fastq1_suffix: "_1.merged.fastq.gz"
+fastq2_suffix: "_2.merged.fastq.gz"
+salmon_quant_flags: ["--seqBias", "--posBias", "--gcBias"]
+# Directory to store Salmon quantifications
+out_dir: tests/salmon/
+
+# Be sure to update config/cluster.yaml to reflect this
+index_threads: 4
+quant_threads: 2
+
+# Name of subdirectory of out_dir to store log/stderr files for each rule
+logs_dir: single_steps_logs/
+
+
