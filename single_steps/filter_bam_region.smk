@@ -19,6 +19,10 @@ SAMPLES = [f.replace(bam_suffix, "") for f in os.listdir(in_bam_dir) if f.endswi
 for s in SAMPLES:
     assert os.path.exists(os.path.join(in_bam_dir, s + bam_suffix + ".bai")), f".bai index file does not exist at same location as input BAM file for sample {s}"
 
+if not os.path.exists(log_dir):
+    os.makedirs(log_dir, exist_ok=True)
+
+
 sys.stderr.write(f"Inferred sample names for input BAM files - {', '.join(SAMPLES)}\n")
 
 
