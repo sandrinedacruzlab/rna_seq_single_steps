@@ -1,5 +1,6 @@
 # Simple snakemake pipelines for common/standard bioinformatics analyses
 
+[![DOI](https://zenodo.org/badge/483979626.svg)](https://doi.org/10.5281/zenodo.15210437)
 
 This repo contains a collection of ad-hoc and flexible pipelines for running common bioinformatics tools on a directory of input files.
 
