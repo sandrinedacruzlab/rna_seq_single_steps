@@ -29,16 +29,12 @@ if not os.path.exists(out_temp_dir):
 
 # conda: "../envs/single_steps.yaml"
 
-localrules: copy_config
-
 rule all:
   input:
     expand(os.path.join(out_fastq_dir, "{sample}.1.pulled.fastq.gz"),
            sample = SAMPLES),
     expand(os.path.join(out_fastq_dir, "{sample}.2.pulled.fastq.gz"),
            sample = SAMPLES if end_type == "pe" else []),
-    os.path.join(out_fastq_dir, "config_sort_pull.yaml")
-
 
 rule name_sort:
     '''
@@ -53,15 +49,20 @@ rule name_sort:
         temp(os.path.join(out_temp_dir, "{sample}.namesorted.bam"))
 
     threads:
-        config["collate_extra_threads"] + 1
+        1
+        #config["collate_extra_threads"] + 1
 
     conda:
         "../envs/single_steps.yaml"
 
+    container:
+        "docker://quay.io/biocontainers/samtools:1.22.1--h96c455f_0"
+
     shell:
         """
+        EXTRA_THREADS=$(({threads} -1))
         samtools collate \
-        -@ {threads} \
+        -@ $EXTRA_THREADS \
         -o {output} \
         {input.aligned_bam}
         """
@@ -74,23 +75,30 @@ if end_type == "pe":
         output:
             one = os.path.join(out_fastq_dir, "{sample}.1.pulled.fastq.gz"),
             two = os.path.join(out_fastq_dir, "{sample}.2.pulled.fastq.gz"),
-
-        params:
             singletons = os.path.join(out_fastq_dir, "{sample}.singletons.fastq.gz")
+
+#        params:
+#             singletons=subpath(output.one, strip_suffix=".1.pulled.fastq.gz") + ".singletons.fastq.gz"
+#            singletons = os.path.join(out_fastq_dir, "{sample}.singletons.fastq.gz")
 
         conda: "../envs/single_steps.yaml"
 
+        container:
+            "docker://quay.io/biocontainers/samtools:1.22.1--h96c455f_0"
+
         threads:
-            config["fastq_extra_threads"] + 1
+             1
+#            config["fastq_extra_threads"] + 1
 
         shell:
             """
+            EXTRA_THREADS=$(({threads} -1))
             samtools fastq \
             -1 {output.one} \
             -2 {output.two} \
-            -s {params.singletons} \
+            -s {output.singletons} \
             -N \
-            -@ {threads} \
+            -@ $EXTRA_THREADS \
             {input}
             """
 
@@ -103,28 +111,18 @@ else:
             one = os.path.join(out_fastq_dir, "{sample}.1.pulled.fastq.gz")
 
         threads:
-            config["fastq_extra_threads"] + 1
+            1
+            #config["fastq_extra_threads"] + 1
 
         conda: "../envs/single_steps.yaml"
-
+        container:
+            "docker://quay.io/biocontainers/samtools:1.22.1--h96c455f_0"
         shell:
             """
+            EXTRA_THREADS=$(({threads} -1))
             samtools fastq \
-            -@ {threads} \
+            -@ $EXTRA_THREADS \
             -0 {output.one} \
             {input}
             """
 
-
-rule copy_config:
-    input:
-        conf = config_path,
-        fqs = expand(os.path.join(out_fastq_dir, "{sample}.1.pulled.fastq.gz"),
-                     sample = SAMPLES)
-    output:
-        os.path.join(out_fastq_dir, "config_sort_pull.yaml")
-
-    shell:
-        """
-        cp {input.conf} {output}
-        """
