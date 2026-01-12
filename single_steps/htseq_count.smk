@@ -93,7 +93,8 @@ rule htseq_count:
         secondary_alignments = htseq_params["secondary_alignments"],
         supplementary_alignments = htseq_params["supplementary_alignments"],
         nprocesses = htseq_params["nprocesses"],
-        quiet = "--quiet" if htseq_params["quiet"] else ""
+        quiet = "--quiet" if htseq_params["quiet"] else "",
+        with_header="--with-header" if htseq_params["with_header"] else ""
 
     log:
         stdout=os.path.join(out_counts_dir, "logs", "htseq_count.stdout.txt"),
@@ -124,6 +125,7 @@ rule htseq_count:
         --nprocesses={threads} \
         --counts_output={output.counts} \
         {params.quiet} \
+        {params.with_header} \
         {input.bam_files} \
         {input.gtf} \
         1> {log.stdout} \

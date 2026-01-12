@@ -64,3 +64,7 @@ htseq_params:
   
   # Suppress progress report
   quiet: false
+
+  # Whether to add a column header to the output TSV file indicating which column corresponds to which input BAM file. Only used if output to console or tsv or csv file.
+  # Default to False.
+  with_header: True
