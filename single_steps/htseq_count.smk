@@ -94,6 +94,10 @@ rule htseq_count:
         supplementary_alignments = htseq_params["supplementary_alignments"],
         nprocesses = htseq_params["nprocesses"],
         quiet = "--quiet" if htseq_params["quiet"] else ""
+
+    log:
+        stdout=os.path.join(out_counts_dir, "logs", "htseq_count.stdout.txt"),
+        stderr=os.path.join(out_counts_dir, "logs", "htseq_count.stderr.txt")
     
     threads:
         1
@@ -121,7 +125,9 @@ rule htseq_count:
         --counts_output={output.counts} \
         {params.quiet} \
         {input.bam_files} \
-        {input.gtf}
+        {input.gtf} \
+        1> {log.stdout} \
+        2> {log.stderr}
         """
 
 rule htseq_count_output_alignments:
@@ -153,6 +159,10 @@ rule htseq_count_output_alignments:
         samout_format = htseq_params["samout_format"],
         nprocesses = htseq_params["nprocesses"],
         quiet = "--quiet" if htseq_params["quiet"] else ""
+
+    log:
+        stdout=os.path.join(out_counts_dir, "logs", "htseq_count_output_alignments.stdout.txt"),
+        stderr=os.path.join(out_counts_dir, "logs", "htseq_count_output_alignments.stderr.txt")
     
     threads:
         1
@@ -182,7 +192,9 @@ rule htseq_count_output_alignments:
         --counts_output={output.counts} \
         {params.quiet} \
         {input.bam_files} \
-        {input.gtf}
+        {input.gtf} \
+        1> {log.stdout} \
+        2> {log.stderr}
         """
 
 # def get_samout_param(samout_enabled):
