@@ -160,7 +160,8 @@ rule htseq_count_output_alignments:
         # samout = "-o " + " ".join(list(output.samout)) if htseq_params["samout_enabled"] else "",
         samout_format = htseq_params["samout_format"],
         nprocesses = htseq_params["nprocesses"],
-        quiet = "--quiet" if htseq_params["quiet"] else ""
+        quiet = "--quiet" if htseq_params["quiet"] else "",
+        with_header="--with-header" if htseq_params["with_header"] else ""
 
     log:
         stdout=os.path.join(out_counts_dir, "logs", "htseq_count_output_alignments.stdout.txt"),
@@ -193,6 +194,7 @@ rule htseq_count_output_alignments:
         --nprocesses={threads} \
         --counts_output={output.counts} \
         {params.quiet} \
+        {params.with_header} \
         {input.bam_files} \
         {input.gtf} \
         1> {log.stdout} \
