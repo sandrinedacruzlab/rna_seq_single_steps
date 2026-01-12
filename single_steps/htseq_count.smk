@@ -99,7 +99,7 @@ rule htseq_count:
         1
     
     container:
-        "docker://quay.io/biocontainers/htseq:2.0.5"
+        "docker://quay.io/biocontainers/htseq:2.0.9--py311h8fb3dee_0"
     
     shell:
         """
@@ -158,7 +158,7 @@ rule htseq_count_output_alignments:
         1
     
     container:
-        "docker://quay.io/biocontainers/htseq:2.0.5"
+        "docker://quay.io/biocontainers/htseq:2.0.9--py311h8fb3dee_0"
     
     shell:
         """
