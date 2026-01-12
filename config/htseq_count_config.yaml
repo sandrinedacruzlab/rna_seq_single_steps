@@ -1,0 +1,66 @@
+# Input/Output directories
+input_dir: "tests/test_data/"
+output_dir: "results/htseq_count/"
+gtf_file: "tests/test_data/annotation.gtf"
+
+# BAM file suffix
+bam_suffix: ".bam"
+
+# HTSeq-count parameters (all defaults from documentation)
+htseq_params:
+  
+  # Sort order for paired-end data (name for sorted by read name and 'pos' for sorted by alignment position)
+  order: "pos"
+  
+  # Maximum reads in buffer for position-sorted paired-end data (how many reads to keep in memory whilst searching for read pairs)
+  max_reads_in_buffer: 30000000
+  
+  # Strandedness (yes for forward stranded, 'no' for unstranded and 'reverse' for reverse stranded) (default: 'yes')
+  stranded: "yes"
+  
+  # Minimum alignment quality (MAPQ) (default: 10)
+  minaqual: 10
+  
+  # Feature type to count (3rd column in GTF)
+  type: "exon"
+  
+  # ID attribute for features (default: 'gene_id')
+  idattr: "gene_id"
+  
+  # Additional attributes to include in output (list)
+  # Example: ["gene_name"] or [] for none
+  additional_attr: ["gene_name", "gene_type"]
+  
+  # Add chromosome information as additional attribute
+  add_chromosome_info: false
+  
+  # Feature query to restrict features (e.g., 'gene_name == "ACTB"')
+  # Leave empty string for no filtering
+  # Currently supports a single kind of expression: attribute == “one attr” to restrict the GFF to a single gene or transcript, e.g. –feature-query ‘gene_name == “ACTB”’ - notice the single quotes around the argument of this option and the double quotes around the gene name.
+  # Broader queries might become available in the future.
+  feature_query: ""
+  
+  # Overlap resolution mode (union/intersection-strict/intersection-nonempty) (default" union)
+  mode: "union"
+  
+  # Mode for handling non-unique alignments (none/all/fraction/random)
+  nonunique: "none"
+  
+  # Handle secondary alignments (score/ignore)
+  secondary_alignments: "score"
+  
+  # Handle supplementary alignments (score/ignore)
+  supplementary_alignments: "score"
+  
+  # SAM output options
+  # Write out all SAM alignment records into SAM files (one per input file needed), annotating each line with its feature assignment (as an optional field with tag ‘XF’)
+  samout_enabled: False
+
+  # sam or bam (default: sam)
+  samout_format: "sam"  
+  
+  # Number of parallel processes
+  nprocesses: 1
+  
+  # Suppress progress report
+  quiet: false
