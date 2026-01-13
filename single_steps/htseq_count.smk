@@ -31,16 +31,6 @@ if htseq_params["samout_enabled"]:
         os.makedirs(out_aln_dir)
 
 
-# def get_samout_param(samout_enabled, samout_dir, sample_names, samout_format):
-#     """Generate the -o parameter string for htseq-count samout option"""
-#     if not samout_enabled:
-#         return ""
-    
-#     out_sam_files = [os.path.join(samout_dir, f"{sample}.annotated.{samout_format}") 
-#                      for sample in sample_names]
-#     return "-o " + " ".join(out_sam_files)
-
-
 # Determine output files for rule all
 # always the count matrix, but include individual BAM files if samout option is enabled
 def get_all_outputs():
@@ -132,7 +122,14 @@ rule htseq_count:
         2> {log.stderr}
         """
 
+
 rule htseq_count_output_alignments:
+    '''
+    Note: for output BAM/SAM files, each output BAM path needs to be prefixed with '-o ' (i.e. -o <bam name 1> -o <bam name 2> etc.)
+    I found this tricky to do via params with accessing the paths from the rule output
+    (NB: need to do it this way so file paths are correctly specified when using the fs plugin for remote systems. Otherwise, will not be directed to temporary space on cluster)
+    My workaround was the sed command inside the shell script, and then passing the assigned variable to the script call
+    '''
     input:
         bam_files = expand(os.path.join(in_bam_dir, "{sample}" + bam_suffix), sample=SAMPLES),
         gtf = gtf_file
@@ -157,7 +154,6 @@ rule htseq_count_output_alignments:
         secondary_alignments = htseq_params["secondary_alignments"],
         supplementary_alignments = htseq_params["supplementary_alignments"],
         samout = output.samout,
-        # samout = "-o " + " ".join(list(output.samout)) if htseq_params["samout_enabled"] else "",
         samout_format = htseq_params["samout_format"],
         nprocesses = htseq_params["nprocesses"],
         quiet = "--quiet" if htseq_params["quiet"] else "",
@@ -175,6 +171,9 @@ rule htseq_count_output_alignments:
     
     shell:
         """
+        SAMOUT_STR=$(echo "{params.samout}" | sed 's/ / -o /g; s/^/-o /')
+        echo $SAMOUT_STR > {log.stdout}
+
         htseq-count \
         --order={params.order} \
         --max-reads-in-buffer={params.max_reads_in_buffer} \
@@ -189,7 +188,7 @@ rule htseq_count_output_alignments:
         --nonunique={params.nonunique} \
         --secondary-alignments={params.secondary_alignments} \
         --supplementary-alignments={params.supplementary_alignments} \
-        -o {params.samout} \
+        $SAMOUT_STR \
         --samout-format={params.samout_format} \
         --nprocesses={threads} \
         --counts_output={output.counts} \
@@ -197,14 +196,6 @@ rule htseq_count_output_alignments:
         {params.with_header} \
         {input.bam_files} \
         {input.gtf} \
-        1> {log.stdout} \
+        1>> {log.stdout} \
         2> {log.stderr}
         """
-
-# def get_samout_param(samout_enabled):
-#     """Generate the -o parameter string for htseq-count samout option"""
-#     if not samout_enabled:
-#         return ""
-    
-#     out_sam_files = rules.htseq_count.output.samout
-#     return "-o " + " ".join(out_sam_files)
