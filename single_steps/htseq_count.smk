@@ -66,7 +66,7 @@ rule htseq_count:
         gtf = gtf_file
     
     output:
-        counts = os.path.join(out_counts_dir, "counts.tsv")
+        counts = temp(os.path.join(out_counts_dir, "counts.htseq.tsv"))
     
     params:
         order = htseq_params["order"],
@@ -135,7 +135,7 @@ rule htseq_count_output_alignments:
         gtf = gtf_file
     
     output:
-        counts = os.path.join(out_counts_dir, "counts.tsv"),
+        counts = temp(os.path.join(out_counts_dir, "counts.htseq.tsv")),
         samout = expand(os.path.join(out_aln_dir, "{sample}.annotated." + htseq_params["samout_format"]), 
                        sample=SAMPLES) if htseq_params.get("samout_enabled", False) else []
     
@@ -197,5 +197,33 @@ rule htseq_count_output_alignments:
         {input.bam_files} \
         {input.gtf} \
         1>> {log.stdout} \
+        2> {log.stderr}
+        """
+
+
+rule htseq_count_reheader_count_matrix:
+    input:
+        counts=rules.htseq_count_output_alignments.output.counts if htseq_params["samout_enabled"] else rules.htseq_count.output.counts
+    output:
+        os.path.join(out_counts_dir, "counts.tsv")
+    params:
+        idattr = htseq_params["idattr"],
+        additional_attr = " ".join([f"--additional-attr {attr}" for attr in htseq_params["additional_attr"]]) if htseq_params["additional_attr"] else "",
+        add_chromosome_info="--add-chromosome-info" if htseq_params["add_chromosome_info"] else "",
+        bamsuffix=bam_suffix
+    log:
+        stdout=os.path.join(out_counts_dir, "logs", "htseq_count_reheader_count_matrix.stdout.txt"),
+        stderr=os.path.join(out_counts_dir, "logs", "htseq_count_reheader_count_matrix.stderr.txt")
+    
+    shell:
+        """
+        python scripts/htseq-count-reheader-counts-matrix.py \
+        --idattr {params.idattr} \
+        --bam-suffix {params.bamsuffix} \
+        {params.additional_attr} \
+        {params.add_chromosome_info} \
+        -o {output} \
+        {input.counts} \
+        1> {log.stdout} \
         2> {log.stderr}
         """
