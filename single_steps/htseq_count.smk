@@ -34,7 +34,7 @@ if htseq_params["samout_enabled"]:
 # Determine output files for rule all
 # always the count matrix, but include individual BAM files if samout option is enabled
 def get_all_outputs():
-    outputs = [os.path.join(out_counts_dir, "counts.tsv")]
+    outputs = [os.path.join(out_counts_dir, "counts.tsv"), os.path.join(out_counts_dir, "counts.assignment-summary-counts.tsv")]
     
     # Add SAM output files if enabled
     if htseq_params.get("samout_enabled", False):
@@ -205,7 +205,8 @@ rule htseq_count_reheader_count_matrix:
     input:
         counts=rules.htseq_count_output_alignments.output.counts if htseq_params["samout_enabled"] else rules.htseq_count.output.counts
     output:
-        os.path.join(out_counts_dir, "counts.tsv")
+        counts=os.path.join(out_counts_dir, "counts.tsv"),
+        assignment_stats=os.path.join(out_counts_dir, "counts.assignment-summary-counts.tsv")
     params:
         idattr = htseq_params["idattr"],
         additional_attr = " ".join([f"--additional-attr {attr}" for attr in htseq_params["additional_attr"]]) if htseq_params["additional_attr"] else "",
@@ -222,7 +223,7 @@ rule htseq_count_reheader_count_matrix:
         --bam-suffix {params.bamsuffix} \
         {params.additional_attr} \
         {params.add_chromosome_info} \
-        -o {output} \
+        -o {output.counts} \
         {input.counts} \
         1> {log.stdout} \
         2> {log.stderr}

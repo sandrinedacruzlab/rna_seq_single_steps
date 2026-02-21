@@ -9,6 +9,15 @@ import sys
 from pathlib import Path
 
 
+ASSIGNMENT_SUMMARY_PREFIXES = {
+    '__no_feature',
+    '__ambiguous',
+    '__too_low_aQual',
+    '__not_aligned',
+    '__alignment_not_unique',
+}
+
+
 def parse_args():
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(
@@ -133,6 +142,21 @@ def reformat_header(header_line, idattr, additional_attrs, bam_suffix, add_chrom
     return '\t'.join(new_fields) + '\n'
 
 
+def get_summary_output_path(output_path):
+    """Derive the assignment summary output file path from the main output path."""
+    p = Path(output_path)
+    if p.suffix == '.tsv':
+        return str(p.with_name(p.stem + '.assignment-summary-counts.tsv'))
+    else:
+        return str(p) + '.assignment-summary-counts.tsv'
+
+
+def is_assignment_summary_row(line):
+    """Return True if the line is an assignment summary row."""
+    first_field = line.split('\t', 1)[0]
+    return first_field in ASSIGNMENT_SUMMARY_PREFIXES
+
+
 def main():
     """Main function."""
     args = parse_args()
@@ -147,14 +171,28 @@ def main():
             sys.stderr.write(f"Error opening input file: {e}\n")
             sys.exit(1)
     
-    # Open output file
-    if args.output == '-':
+    # Determine output mode
+    use_stdout = (args.output == '-')
+
+    # Open main output file
+    if use_stdout:
         output_file = sys.stdout
+        summary_file = sys.stderr
     else:
         try:
             output_file = open(args.output, 'w')
         except IOError as e:
             sys.stderr.write(f"Error opening output file: {e}\n")
+            if input_file != sys.stdin:
+                input_file.close()
+            sys.exit(1)
+        
+        summary_output_path = get_summary_output_path(args.output)
+        try:
+            summary_file = open(summary_output_path, 'w')
+        except IOError as e:
+            sys.stderr.write(f"Error opening summary output file: {e}\n")
+            output_file.close()
             if input_file != sys.stdin:
                 input_file.close()
             sys.exit(1)
@@ -174,21 +212,29 @@ def main():
                 args.bam_suffix,
                 args.add_chromosome_info
             )
-            output_file.write(new_header)
         except ValueError as e:
             sys.stderr.write(f"Error processing header: {e}\n")
             sys.exit(1)
+
+        # Write reformatted header to both output files
+        output_file.write(new_header)
+        summary_file.write(new_header)
         
-        # Copy remaining lines unchanged
+        # Route remaining lines based on whether they are assignment summary rows
         for line in input_file:
-            output_file.write(line)
+            if not line.strip():
+                continue  # skip blank lines
+            if is_assignment_summary_row(line):
+                summary_file.write(line)
+            else:
+                output_file.write(line)
     
     finally:
-        # Close files if not stdin/stdout
         if input_file != sys.stdin:
             input_file.close()
-        if output_file != sys.stdout:
+        if not use_stdout:
             output_file.close()
+            summary_file.close()
 
 
 if __name__ == '__main__':

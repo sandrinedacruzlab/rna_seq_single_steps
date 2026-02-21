@@ -1,0 +1,8 @@
+			data/bams/sample1.chr8.bam	data/bams/sample2.chr8.bam
+ENSG00000003987.15	MTMR7	protein_coding	0	1
+ENSG00000003989.19	SLC7A2	protein_coding	0	0
+__no_feature			2819226	950874
+__ambiguous			4647113	3872547
+__too_low_aQual			494	636
+__not_aligned			319812	831956
+__alignment_not_unique			6103653	5838915
