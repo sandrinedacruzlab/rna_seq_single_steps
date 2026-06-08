@@ -1,0 +1,37 @@
+default-resources:
+    clusters: 'wice'
+    slurm_account: 'lp_big_wice_cpu'
+    slurm_partition: 'dedicated_big_bigmem'
+    mem_mb: 2000
+    threads: 1
+    runtime: 15
+
+set-resources:
+    name_sort:
+        mem_mb: 14000
+        runtime: 180
+    bam_to_fastq:
+        mem_mb: 14000
+        runtime: 180
+    custom_txome_fasta:
+        mem_mb: 10000
+        runtime: 30
+    generate_full_decoys:
+        mem_mb: 14000
+        runtime: 60
+    salmon_index:
+        mem_mb: 14000
+        runtime: 240
+    salmon_quant_pe:
+        mem_mb: 14000
+        runtime: 240
+    salmon_quant_se:
+        mem_mb: 14000
+        runtime: 240
+
+set-threads:
+    name_sort: 4
+    bam_to_fastq: 4
+    salmon_index: 4
+    salmon_quant_pe: 8
+    salmon_quant_se: 8
