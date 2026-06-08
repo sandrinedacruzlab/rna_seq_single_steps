@@ -41,8 +41,8 @@ if config['end_type'] == "pe":
 else:
     ruleorder: salmon_quant_se > salmon_quant_pe
 
-# Set global conda environment, avoids specifying for each rule
-conda: "../envs/single_steps.yaml"
+# # Set global conda environment, avoids specifying for each rule
+# conda: "../envs/single_steps.yaml"
 
 rule all:
     input:
@@ -54,42 +54,45 @@ rule custom_txome_fasta:
     Generate FASTA file of input transcripts for use with Salmon
     '''
     input:
-        config["gtf"]
+        gtf = config["gtf"],
+        genoma_fa = config["genome_fasta"]
 
     output:
-        os.path.join(salmon_index_dir, salmon_index_name, "transcripts.fa")
-
-    params:
-        genome_fa = config["genome_fasta"]
+        fa = os.path.join(salmon_index_dir, "index_input_files", salmon_index_name, "transcripts.fa")
 
     log:
-        os.path.join(log_subdir,
-                     "custom_txome_fasta.log")
+        stdout = os.path.join(log_subdir,
+                     "custom_txome_fasta.stdout.log"),
+        stderr = os.path.join(log_subdir,
+                     "custom_txome_fasta.stderr.log")                  
 
-    conda: "../envs/single_steps.yaml"
+    # conda: "../envs/single_steps.yaml"
+    container: 
+        "https://depot.galaxyproject.org/singularity/gffread%3A0.12.9--hf426362_0"
+    # container: "docker://quay.io/biocontainers/gffread:0.9.12--0"
 
     shell:
         """
         gffread \
-        -w {output} \
-        -g {params.genome_fa} \
-        {input}
+        -w {output.fa} \
+        -g {input.genome_fa} \
+        {input.gtf} \
+        1> {log.stdout} \
+        2> {log.stderr}
         """
 
+# def target_txome_fasta(make_fasta, custom_path):
+#     '''
+#     '''
 
-def target_txome_fasta(make_fasta, custom_path):
-    '''
-    '''
+#     assert isinstance(make_fasta, bool)
 
-    assert isinstance(make_fasta, bool)
-
-    if make_fasta:
-        # Need to return output of snakemake rule
-        return custom_path
-
-    else:
-        # Return path to provided file
-        return config["transcripts_fasta"]
+#     if make_fasta:
+#         # Need to return output of snakemake rule
+#         return custom_path
+#     else:
+#         # Return path to provided file
+#         return config["transcripts_fasta"]
 
 
 rule generate_full_decoys:
@@ -100,16 +103,17 @@ rule generate_full_decoys:
     '''
     input:
         genome_fa = config["genome_fasta"],
-        txome_fa = target_txome_fasta(config["generate_fasta"], rules.custom_txome_fasta.output)
+        txome_fa = lambda wildcards: rules.custom_txome_fasta.output.fa if config["generate_fasta"] else config["transcripts_fasta"]
+        # txome_fa = target_txome_fasta(config["generate_fasta"], )
         # os.path.join(SALMON_SUBDIR, "min_jnc_{min_jnc}", "min_frac_{min_frac}", "min_cov_{min_cov}","papa.transcripts.fa"),
 
     output:
-        gentrome_fa = os.path.join(salmon_index_dir, salmon_index_name, "gentrome.fa"),
-        decoys = os.path.join(salmon_index_dir, salmon_index_name, "decoys.txt")
+        gentrome_fa = os.path.join(salmon_index_dir, "index_input_files", salmon_index_name,"gentrome.fa"),
+        decoys = os.path.join(salmon_index_dir, "index_input_files", salmon_index_name, "decoys.txt")
 
     log:
         os.path.join(log_subdir,
-                     "generate_full_decoys.log")
+                     "generate_full_decoys.stderr.log")
 
     shell:
         """
@@ -126,31 +130,36 @@ rule salmon_index:
         decoys = rules.generate_full_decoys.output.decoys
 
     output:
-        seq = os.path.join(salmon_index_dir, salmon_index_name, "seq.bin"),
-        pos = os.path.join(salmon_index_dir, salmon_index_name, "pos.bin")
+        dir = directory(os.path.join(salmon_index_dir, salmon_index_name)),
 
     params:
         k = config["salmon_kmer_size"],
-        outdir = os.path.join(salmon_index_dir, salmon_index_name, "")
+        # outdir = subpath(output.seq, parent=True)
 
     threads:
-        config["index_threads"]
+        1
+        # config["index_threads"]
 
     log:
-        os.path.join(log_subdir,
-                     "salmon_index.log")
+        stdout = os.path.join(log_subdir,
+                     "salmon_index.stdout.log"),
+                 stderr = os.path.join(log_subdir,
+                     "salmon_index.stderr.log"),            
 
-    conda: "../envs/single_steps.yaml"
+    # conda: "../envs/single_steps.yaml"
+
+    container: "docker://quay.io/biocontainers/salmon:1.4.0--hf69c8f4_0"
 
     shell:
         """
         salmon index \
         -t {input.gentrome_fa} \
-        -i {params.outdir} \
+        -i {output.dir} \
         --decoys {input.decoys} \
         -k {params.k} \
         -p {threads} \
-        &> {log}
+        1> {log.stdout} \
+        2> {log.stderr}
         """
 
 
@@ -158,25 +167,30 @@ rule salmon_quant_pe:
     input:
         fast1 = os.path.join(fastq_dir, "{sample}" + fastq1_suffix),
         fast2 = os.path.join(fastq_dir, "{sample}" + fastq2_suffix),
-        index = rules.salmon_index.output.seq
+        index = rules.salmon_index.output.dir
 
     output:
-        os.path.join(out_dir, "{sample}", "quant.sf")
+        sf = os.path.join(out_dir, "{sample}", "quant.sf")
 
     params:
         index_dir = os.path.join(salmon_index_dir, salmon_index_name),
-        output_dir = os.path.join(out_dir, "{sample}"),
+        output_dir = subpath(output.sf, parent=True),
         libtype = config["salmon_strand_info"],
         extra_flags = " ".join(config["salmon_quant_flags"])
 
     threads:
-        config["quant_threads"]
+        1
+        # config["quant_threads"]
 
     log:
-        os.path.join(log_subdir,
-                     "salmon_quant_pe.{sample}.log")
+        stdout = os.path.join(log_subdir,
+                     "salmon_quant_pe.{sample}.stdout.log"),
+        stderr = os.path.join(log_subdir,
+                     "salmon_quant_pe.{sample}.stderr.log")
 
-    conda: "../envs/single_steps.yaml"
+    # conda: "../envs/single_steps.yaml"
+
+    container: "docker://quay.io/biocontainers/salmon:1.4.0--hf69c8f4_0"
 
     shell:
         """
@@ -188,32 +202,39 @@ rule salmon_quant_pe:
         --threads {threads} \
         -o {params.output_dir} \
         {params.extra_flags} \
-        &> {log}
+        1> {log.stdout} \
+        2> {log.stderr}
         """
 
 
 rule salmon_quant_se:
     input:
         fast1 = os.path.join(fastq_dir, "{sample}" + fastq1_suffix),
-        index = rules.salmon_index.output.seq
+        index = rules.salmon_index.output.dir
 
     output:
         os.path.join(out_dir, "{sample}", "quant.sf")
 
     params:
         index_dir = os.path.join(salmon_index_dir, salmon_index_name),
-        output_dir = os.path.join(out_dir, "{sample}"),
+        output_dir = subpath(output.sf, parent=True),
         libtype = config["salmon_strand_info"],
         extra_flags = " ".join(config["salmon_quant_flags"])
 
     threads:
-        config["quant_threads"]
+        1
+        # config["quant_threads"]
 
     log:
-        os.path.join(log_subdir,
-                     "salmon_quant_se.{sample}.log")
+       stdout = os.path.join(log_subdir,
+                     "salmon_quant_se.{sample}.stderr.log"),
+       stderr = os.path.join(log_subdir,
+                     "salmon_quant_se.{sample}.stderr.log")
 
-    conda: "../envs/single_steps.yaml"
+    # conda: "../envs/single_steps.yaml"
+
+    container: "docker://quay.io/biocontainers/salmon:1.4.0--hf69c8f4_0"
+
 
     shell:
         """
@@ -224,5 +245,6 @@ rule salmon_quant_se:
         --threads {threads} \
         -o {params.output_dir} \
         {params.extra_flags} \
-        &> {log}
+        1> {log.stdout} \
+        2> {log.stderr}
         """
